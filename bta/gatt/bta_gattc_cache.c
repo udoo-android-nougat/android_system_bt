@@ -314,7 +314,8 @@ static tBTA_GATT_STATUS bta_gattc_add_attr_to_cache(tBTA_GATTC_SERV *p_srvc_cb,
         descriptor->handle = handle;
         memcpy(&descriptor->uuid, p_uuid, sizeof(tBT_UUID));
 
-        if (service->characteristics == NULL) {
+        if (service->characteristics == NULL ||
+            list_is_empty(service->characteristics)) {
             APPL_TRACE_ERROR("%s: Illegal action to add descriptor before adding a characteristic!",
                              __func__);
             osi_free(descriptor);
@@ -1550,7 +1551,7 @@ bool bta_gattc_cache_load(tBTA_GATTC_CLCB *p_clcb)
 
     attr = osi_malloc(sizeof(tBTA_GATTC_NV_ATTR) * num_attr);
 
-    if (fread(attr, sizeof(tBTA_GATTC_NV_ATTR), 0xFF, fd) != num_attr) {
+    if (fread(attr, sizeof(tBTA_GATTC_NV_ATTR), num_attr, fd) != num_attr) {
         APPL_TRACE_ERROR("%s: can't read GATT attributes: %s", __func__, fname);
         goto done;
     }
